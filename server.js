@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 10000;
 
 app.get('/', (req, res) => {
-  res.send('ChatDealer bot is running and connected to Twitch!');
+  res.send('ChatDealer bot is running and connected to Twitch via Google Apps Script!');
 });
 
 app.listen(PORT, () => {
@@ -19,6 +19,9 @@ const BOT_USERNAME = 'chatdealer';
 const OAUTH_TOKEN = process.env.BOT_OAUTH_TOKEN;
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 
+// PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
+const GAS_WEB_APP_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
 let botUserId = null;
 
 const client = new tmi.Client({
@@ -27,7 +30,7 @@ const client = new tmi.Client({
     username: BOT_USERNAME,
     password: OAUTH_TOKEN
   },
-  channels: [] // Starts completely empty; populates automatically via mod status
+  channels: [] // Populates automatically via mod status
 });
 
 // Helper: Automatically fetch the bot's numeric user ID from Twitch Helix API on boot
@@ -68,7 +71,6 @@ async function syncModChannels() {
     const moddedChannels = response.data.data.map(ch => ch.broadcaster_login.toLowerCase());
     const currentChannels = client.getChannels().map(c => c.replace('#', ''));
 
-    // Join new channels where you've been modded
     for (const channel of moddedChannels) {
       if (!currentChannels.includes(channel)) {
         await client.join(channel);
@@ -76,7 +78,6 @@ async function syncModChannels() {
       }
     }
 
-    // Leave channels where you are no longer a mod
     for (const channel of currentChannels) {
       if (!moddedChannels.includes(channel)) {
         await client.part(channel);
@@ -88,16 +89,48 @@ async function syncModChannels() {
   }
 }
 
-// 3. Listen for the !blackjack command
-client.on('message', (target, context, message, self) => {
+// 3. Forward Chat Commands to Google Apps Script
+client.on('message', async (target, context, message, self) => {
   if (self) return;
 
-  const args = message.trim().split(' ');
-  const command = args[0].toLowerCase();
+  const username = context.username;
+  const msgText = message.trim();
+  if (!msgText.startsWith('!')) return;
 
-  if (command === '!blackjack') {
-    const bet = args[1] || '1';
-    client.say(target, `@${context.username} played blackjack with a bet of ${bet}! ♠️`);
+  const args = msgText.slice(1).split(' ');
+  const action = args[0].toLowerCase();
+  const arg = args.slice(1).join(' ');
+
+  // Map common aliases to match your Google Apps Script actions
+  let mappedAction = action;
+  if (action === 'bj') mappedAction = 'blackjack';
+  if (action === 'dd') mappedAction = 'doubledown';
+
+  // Actions supported by your Apps Script backend
+  const supportedActions = [
+    'blackjack', 'bj', 'hit', 'stand', 'doubledown', 'dd', 
+    'split', 'insurance', 'daily', 'fortune', 'points', 'top', 'gift'
+  ];
+
+  if (!supportedActions.includes(mappedAction)) return;
+
+  try {
+    // Make an HTTP GET request to your Google Apps Script Web App
+    const response = await axios.get(GAS_WEB_APP_URL, {
+      params: {
+        action: mappedAction,
+        user: username,
+        arg: arg
+      }
+    });
+
+    // Google Apps Script returns text output directly (e.g., game result strings or leaderboards)
+    const replyText = response.data;
+    if (replyText && typeof replyText === 'string' && replyText.trim().length > 0) {
+      client.say(target, replyText);
+    }
+  } catch (err) {
+    console.error('Error communicating with Google Apps Script:', err.message);
   }
 });
 
@@ -105,10 +138,8 @@ client.on('message', (target, context, message, self) => {
 client.connect().then(async () => {
   console.log('ChatDealer connected to Twitch IRC successfully.');
   
-  // Resolve the numeric ID first, then run initial sync
   await fetchBotUserId();
   syncModChannels();
   
-  // Re-check mod permissions every 5 minutes automatically
   setInterval(syncModChannels, 5 * 60 * 1000);
 });
