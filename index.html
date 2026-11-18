@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatDealer Bot Whitelist</title>
+  <!-- Pixel Spade Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11' fill='%23facc15'%3E%3Cpath d='M5 1h1v1h1v1h1v1h1v1h1v2H9v1H7V7H6v2h2v1H3V9h2V7H4v1H2V7H1V5h1V4h1V3h1V2h1V1z'/%3E%3C/svg%3E">
+  <!-- Retro 8-bit Pixel Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #14121d;
+      --twitch-purple: #9146ff;
+      --twitch-light: #b98aff;
+      --gold: #facc15;
+      --pixel-border: #09090b;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      image-rendering: pixelated;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(#231f33 2px, transparent 2px),
+        radial-gradient(#1b1829 2px, #14121d 2px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+      font-family: 'Press Start 2P', monospace;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pixel-box {
+      border: 4px solid var(--pixel-border);
+      box-shadow:
+        inset -4px -4px 0px rgba(0, 0, 0, 0.35),
+        inset 4px 4px 0px rgba(255, 255, 255, 0.18),
+        0 6px 0 var(--pixel-border);
+    }
+
+    .pixel-btn {
+      font-family: 'Press Start 2P', monospace;
+      border: 4px solid var(--pixel-border);
+      padding: 12px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      position: relative;
+      transition: transform 0.05s steps(1);
+      box-shadow:
+        inset -4px -4px 0px rgba(0, 0, 0, 0.4),
+        inset 4px 4px 0px rgba(255, 255, 255, 0.25),
+        0 4px 0 var(--pixel-border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      line-height: 1.2;
+      text-decoration: none;
+    }
+
+    .pixel-btn:hover:not(:disabled) { filter: brightness(1.08); }
+    .pixel-btn:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow:
+        inset -2px -2px 0px rgba(0, 0, 0, 0.4),
+        inset 2px 2px 0px rgba(255, 255, 255, 0.25),
+        0 0px 0 var(--pixel-border);
+    }
+
+    .btn-twitch { background: var(--twitch-purple); color: #fff; }
+    .btn-slate { background: #475569; color: #f8fafc; }
+    .btn-gold { background: var(--gold); color: #18181b; }
+    .btn-red { background: #ef4444; color: #fff; }
+    .btn-green { background: #22c55e; color: #fff; }
+    .btn-yellow { background: var(--gold); color: #18181b; }
+
+    .hud-header {
+      width: 100%;
+      max-width: 900px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1e1b2e;
+      border-bottom: 4px solid var(--pixel-border);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+      margin-top: 20px;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 #000;
+      text-decoration: none;
+    }
+
+    .invite-container {
+      width: 100%;
+      max-width: 680px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .invite-card {
+      background: #1e1b2e;
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    .invite-heading {
+      font-size: 14px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 #000;
+      line-height: 1.5;
+    }
+
+    .invite-description {
+      font-size: 9px;
+      line-height: 1.8;
+      color: #cbd5e1;
+      max-width: 520px;
+    }
+
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 520px;
+      text-align: left;
+      background: #0f0d17;
+      border: 3px solid var(--pixel-border);
+      padding: 16px;
+    }
+
+    .feature-item {
+      font-size: 8px;
+      color: #4ade80;
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .feature-item span { color: #f8fafc; }
+
+    .status-banner {
+      background: #09090b;
+      border: 4px solid #4ade80;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 8px;
+      line-height: 1.8;
+      color: #4ade80;
+      width: 100%;
+      max-width: 520px;
+      display: none;
+    }
+
+    .subtle-link-wrap {
+      margin-top: 4px;
+    }
+    .subtle-link {
+      font-size: 7px;
+      color: rgba(255, 255, 255, 0.25);
+      text-decoration: none;
+      transition: color 0.1s;
+    }
+    .subtle-link:hover {
+      color: #f87171;
+      text-decoration: underline;
+    }
+
+    .page-footer {
+      padding: 15px 0 25px;
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.45);
+      text-align: center;
+    }
+
+    .page-footer a { color: var(--twitch-light); text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER BAR -->
+  <header class="hud-header pixel-box">
+    <a href="https://theoinnit.github.io/twitch-blackjack-webversion/" class="brand-title">
+      <svg width="20" height="20" viewBox="0 0 11 11" fill="#facc15">
+        <path d="M5 1h1v1h1v1h1v1h1v1h1v2H9v1H7V7H6v2h2v1H3V9h2V7H4v1H2V7H1V5h1V4h1V3h1V2h1V1z"/>
+      </svg>
+      <span>TWITCH BLACKJACK</span>
+    </a>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <a href="https://theoinnit.github.io/twitch-blackjack-webversion/" class="pixel-btn btn-slate" style="font-size: 8px; padding: 8px 10px;">PLAY GAME</a>
+      <button class="pixel-btn btn-red" id="btn-logout" style="font-size: 8px; padding: 8px 10px; display: none;">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="invite-container">
+    <div class="invite-card pixel-box">
+      <div style="font-size: 32px;" id="card-icon">♠️</div>
+      <h1 class="invite-heading" id="card-title">ChatDealer Bot Whitelist</h1>
+      <p class="invite-description" id="card-desc">
+        Log in with your Twitch account to verify your channel name, then add the bot to your channel's whitelist database!
+      </p>
+
+      <div class="features-list" id="features-box">
+        <div class="feature-item">✓ <span>Secure verification: Only reads your public Twitch login.</span></div>
+        <div class="feature-item">✓ <span>Direct sync: Instantly updates your Google Sheets whitelist[cite: 1].</span></div>
+      </div>
+
+      <!-- STATUS BANNER -->
+      <div id="status-banner" class="status-banner"></div>
+
+      <!-- ACTION AREA -->
+      <div id="action-area">
+        <button class="pixel-btn btn-twitch" id="login-btn" style="font-size: 10px; padding: 14px 24px;">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="#ffffff">
+            <path d="M2 1h9v7l-2 2H6l-2 2v-2H2V1zm1 1v6h2v2l2-2h2l1-1V2H3zm3 2h1v3H6V4zm2 0h1v3H8V4z"/>
+          </svg>
+          LOGIN WITH TWITCH
+        </button>
+      </div>
+
+      <!-- Subtle Remove Link -->
+      <div class="subtle-link-wrap">
+        <a href="#" class="subtle-link" id="remove-link" style="display: none;">remove bot from channel</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="page-footer">
+    created by <a href="http://twitch.tv/theoinnit_" target="_blank">TheoInnit_</a>
+  </footer>
+
+  <script>
+    const TWITCH_CLIENT_ID = 'z4ylqbpm3ivqtxcj9h2iabfy2wajr6';
+    const STORAGE_KEY = 'chatdealer_whitelisted_channel';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwODUpD2NufazfcPFiDVnKVaUDCZ5x1jS4ACTpCmCZrSjsXtEhLus9A8KN-3GBAWNuH/exec';
+
+    let loggedInUsername = null;
+
+    async function initPage() {
+      document.getElementById('login-btn').addEventListener('click', loginWithTwitch);
+      document.getElementById('btn-logout').addEventListener('click', logoutUser);
+      document.getElementById('remove-link').addEventListener('click', removeChannelFromWhitelist);
+
+      if (window.location.hash && window.location.hash.includes('access_token=')) {
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const token = params.get('access_token');
+        if (token) {
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          await fetchTwitchUser(token);
+        }
+      }
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        loggedInUsername = saved;
+        await checkAndSetupUI(loggedInUsername);
+      }
+    }
+
+    async function fetchTwitchUser(token) {
+      try {
+        const res = await fetch('https://api.twitch.tv/helix/users', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Client-Id': TWITCH_CLIENT_ID
+          }
+        });
+        const data = await res.json();
+        if (data.data && data.data[0]) {
+          loggedInUsername = data.data[0].login.toLowerCase();
+          localStorage.setItem(STORAGE_KEY, loggedInUsername);
+          await checkAndSetupUI(loggedInUsername);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Twitch user:', err);
+      }
+    }
+
+    async function checkAndSetupUI(username) {
+      document.getElementById('card-icon').textContent = '👤';
+      document.getElementById('card-title').textContent = `LOGGED IN AS #${username.toUpperCase()}`;
+      document.getElementById('card-desc').textContent = `Checking whitelist status...`;
+      document.getElementById('features-box').style.display = 'none';
+
+      let isAlreadyWhitelisted = false;
+
+      try {
+        // FIRST: Check whitelist status before rendering button state
+        const checkRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&channel=${encodeURIComponent(username)}`);
+        const checkData = await checkRes.json();
+        if (checkData.status === 'exists') {
+          isAlreadyWhitelisted = true;
+        }
+      } catch (err) {
+        console.error('Failed to check whitelist status:', err);
+      }
+
+      document.getElementById('card-desc').textContent = isAlreadyWhitelisted
+        ? `Bot is already added to your channel!`
+        : `Click the button below to add ChatDealer to your channel's whitelist database!`;
+
+      const actionArea = document.getElementById('action-area');
+      if (isAlreadyWhitelisted) {
+        actionArea.innerHTML = `
+          <button class="pixel-btn btn-yellow" id="add-bot-btn" style="font-size: 10px; padding: 14px 24px;">
+            BOT ALREADY ADDED TO YOUR CHANNEL
+          </button>
+        `;
+      } else {
+        actionArea.innerHTML = `
+          <button class="pixel-btn btn-green" id="add-bot-btn" style="font-size: 10px; padding: 14px 24px;">
+            ADD BOT TO CHANNEL
+          </button>
+        `;
+      }
+
+      document.getElementById('add-bot-btn').addEventListener('click', handleAddBotClick);
+      document.getElementById('btn-logout').style.display = 'inline-flex';
+      document.getElementById('remove-link').style.display = 'inline';
+    }
+
+    async function handleAddBotClick() {
+      if (!loggedInUsername) return;
+
+      const addBtn = document.getElementById('add-bot-btn');
+      addBtn.disabled = true;
+      addBtn.textContent = "CHECKING...";
+
+      try {
+        // FIRST CHECK AGAIN ON CLICK
+        const checkRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&channel=${encodeURIComponent(loggedInUsername)}`);
+        const checkData = await checkRes.json();
+
+        const banner = document.getElementById('status-banner');
+        banner.style.display = 'block';
+
+        if (checkData.status === 'exists') {
+          banner.style.borderColor = '#facc15';
+          banner.style.color = '#facc15';
+          banner.innerHTML = `<strong>NOTICE:</strong> Bot already added to your channel!`;
+          
+          addBtn.textContent = "BOT ALREADY ADDED TO YOUR CHANNEL";
+          addBtn.className = "pixel-btn btn-yellow";
+          addBtn.disabled = false;
+          return;
+        }
+
+        // IF NOT IN SHEET YET, ADD THEM
+        addBtn.textContent = "ADDING...";
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=addchannel&channel=${encodeURIComponent(loggedInUsername)}`);
+        const data = await res.json();
+
+        if (data.status === 'exists') {
+          banner.style.borderColor = '#facc15';
+          banner.style.color = '#facc15';
+          banner.innerHTML = `<strong>NOTICE:</strong> Bot already added to your channel!`;
+          addBtn.textContent = "BOT ALREADY ADDED TO YOUR CHANNEL";
+          addBtn.className = "pixel-btn btn-yellow";
+        } else {
+          banner.style.borderColor = '#4ade80';
+          banner.style.color = '#4ade80';
+          banner.innerHTML = `<strong>SUCCESS!</strong> Bot added to your channel's whitelist[cite: 1]!`;
+          addBtn.textContent = "BOT ALREADY ADDED TO YOUR CHANNEL";
+          addBtn.className = "pixel-btn btn-yellow";
+        }
+        addBtn.disabled = false;
+
+      } catch (err) {
+        console.error('Error processing request:', err);
+        addBtn.disabled = false;
+        addBtn.textContent = "ADD BOT TO CHANNEL";
+        alert('Failed to connect to Google Sheets. Please try again.');
+      }
+    }
+
+    async function removeChannelFromWhitelist(e) {
+      e.preventDefault();
+      if (!loggedInUsername) return;
+
+      if (confirm(`Remove #${loggedInUsername} from the whitelist[cite: 1]?`)) {
+        try {
+          await fetch(`${GOOGLE_SCRIPT_URL}?action=removechannel&channel=${encodeURIComponent(loggedInUsername)}`);
+          localStorage.removeItem(STORAGE_KEY);
+          alert(`Channel #${loggedInUsername} has been removed from the whitelist[cite: 1].`);
+          window.location.reload();
+        } catch (err) {
+          alert('Failed to communicate with Google Sheets.');
+        }
+      }
+    }
+
+    function loginWithTwitch() {
+      const redirectUri = window.location.origin + window.location.pathname;
+      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:email`;
+      window.location.href = authUrl;
+    }
+
+    function logoutUser() {
+      localStorage.removeItem(STORAGE_KEY);
+      window.location.href = window.location.pathname;
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
+</body>
+</html>
