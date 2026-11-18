@@ -1,7 +1,20 @@
 const tmi = require('tmi.js');
 const axios = require('axios');
+const express = require('express');
 
-// 1. Core Bot & API Credentials (pulled securely from Render environment variables)
+// Setup Express to satisfy Render's port-binding requirement
+const app = express();
+const PORT = process.env.PORT || 10000;
+
+app.get('/', (req, res) => {
+  res.send('ChatDealer bot is running and connected to Twitch!');
+});
+
+app.listen(PORT, () => {
+  console.log(`[HTTP] Server is listening on port ${PORT}`);
+});
+
+// 1. Core Bot & API Credentials (pulled from Render environment variables)
 const BOT_USERNAME = 'chatdealer';
 const OAUTH_TOKEN = process.env.BOT_OAUTH_TOKEN;
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID;
