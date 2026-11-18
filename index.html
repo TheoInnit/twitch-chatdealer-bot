@@ -234,7 +234,7 @@
 
       <div class="features-list" id="features-box">
         <div class="feature-item">✓ <span>Secure verification: Only reads your public Twitch login.</span></div>
-        <div class="feature-item">✓ <span>Direct sync: Instantly updates your Google Sheets whitelist[cite: 1].</span></div>
+        <div class="feature-item">✓ <span>Direct sync: Instantly updates your Google Sheets whitelist.</span></div>
       </div>
 
       <!-- STATUS BANNER -->
@@ -266,6 +266,7 @@
     const TWITCH_CLIENT_ID = 'z4ylqbpm3ivqtxcj9h2iabfy2wajr6';
     const STORAGE_KEY = 'chatdealer_whitelisted_channel';
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwODUpD2NufazfcPFiDVnKVaUDCZ5x1jS4ACTpCmCZrSjsXtEhLus9A8KN-3GBAWNuH/exec';
+    const GITHUB_PAGES_URL = 'https://theoinnit.github.io/twitch-chatdealer-bot/';
 
     let loggedInUsername = null;
 
@@ -318,7 +319,6 @@
       let isAlreadyWhitelisted = false;
 
       try {
-        // FIRST: Check whitelist status before rendering button state
         const checkRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&channel=${encodeURIComponent(username)}`);
         const checkData = await checkRes.json();
         if (checkData.status === 'exists') {
@@ -360,7 +360,6 @@
       addBtn.textContent = "CHECKING...";
 
       try {
-        // FIRST CHECK AGAIN ON CLICK
         const checkRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=check&channel=${encodeURIComponent(loggedInUsername)}`);
         const checkData = await checkRes.json();
 
@@ -378,7 +377,6 @@
           return;
         }
 
-        // IF NOT IN SHEET YET, ADD THEM
         addBtn.textContent = "ADDING...";
         const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=addchannel&channel=${encodeURIComponent(loggedInUsername)}`);
         const data = await res.json();
@@ -392,7 +390,7 @@
         } else {
           banner.style.borderColor = '#4ade80';
           banner.style.color = '#4ade80';
-          banner.innerHTML = `<strong>SUCCESS!</strong> Bot added to your channel's whitelist[cite: 1]!`;
+          banner.innerHTML = `<strong>SUCCESS!</strong> Bot added to your channel's whitelist!`;
           addBtn.textContent = "BOT ALREADY ADDED TO YOUR CHANNEL";
           addBtn.className = "pixel-btn btn-yellow";
         }
@@ -410,11 +408,11 @@
       e.preventDefault();
       if (!loggedInUsername) return;
 
-      if (confirm(`Remove #${loggedInUsername} from the whitelist[cite: 1]?`)) {
+      if (confirm(`Remove #${loggedInUsername} from the whitelist?`)) {
         try {
           await fetch(`${GOOGLE_SCRIPT_URL}?action=removechannel&channel=${encodeURIComponent(loggedInUsername)}`);
           localStorage.removeItem(STORAGE_KEY);
-          alert(`Channel #${loggedInUsername} has been removed from the whitelist[cite: 1].`);
+          alert(`Channel #${loggedInUsername} has been removed from the whitelist.`);
           window.location.reload();
         } catch (err) {
           alert('Failed to communicate with Google Sheets.');
@@ -423,14 +421,13 @@
     }
 
     function loginWithTwitch() {
-      const redirectUri = window.location.origin + window.location.pathname;
-      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=user:read:email`;
+      const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${encodeURIComponent(TWITCH_CLIENT_ID)}&redirect_uri=${encodeURIComponent(GITHUB_PAGES_URL)}&response_type=token&scope=user:read:email`;
       window.location.href = authUrl;
     }
 
     function logoutUser() {
       localStorage.removeItem(STORAGE_KEY);
-      window.location.href = window.location.pathname;
+      window.location.href = GITHUB_PAGES_URL;
     }
 
     if (document.readyState === 'loading') {
