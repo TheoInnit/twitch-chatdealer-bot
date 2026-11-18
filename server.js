@@ -53,7 +53,11 @@ client.connect().then(() => {
 // 2. OAuth Callback Route (Triggered when a streamer invites the bot)
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
-    if (!code) return res.status(400).send("Missing authorization code.");
+    
+    // If someone visits /callback directly without an auth code, redirect them cleanly to the invite page
+    if (!code) {
+        return res.redirect('https://theoinnit.github.io/twitch-blackjack-webversion/invite.html');
+    }
 
     try {
         const tokenRes = await axios.post('https://id.twitch.tv/oauth2/token', null, {
@@ -86,10 +90,12 @@ app.get('/callback', async (req, res) => {
         await client.join(streamerUsername);
         console.log(`New invite! Joined #${streamerUsername}`);
 
-        res.send(`Success! ChatDealer has joined #${streamerUsername}'s chat. Make sure to type /mod chatdealer in your chat so it isn't rate-limited!`);
+        // Automatically redirect back to your invite page with success flag
+        return res.redirect('https://theoinnit.github.io/twitch-blackjack-webversion/invite.html');
     } catch (error) {
         console.error("OAuth Invite Error:", error.response?.data || error.message);
-        res.status(500).send("Something went wrong while inviting ChatDealer.");
+        // On error, redirect back to the invite page as well so the user isn't stuck on a white text page
+        return res.redirect('https://theoinnit.github.io/twitch-blackjack-webversion/invite.html');
     }
 });
 
