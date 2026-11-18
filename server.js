@@ -1,10 +1,10 @@
 const tmi = require('tmi.js');
 const axios = require('axios');
 
-// 1. Core Bot & API Credentials
-const BOT_USERNAME = 'chatdealer'; // Your bot's exact Twitch username (lowercase)
-const OAUTH_TOKEN = 'oauth:vjhjxy83zujs855npbs9k0eb6gos9e'; // Your embedded bot OAuth token
-const CLIENT_ID = 'z4ylqbpm3ivqtxcj9h2iabfy2wajr6'; // Your Twitch Developer Client ID
+// 1. Core Bot & API Credentials (pulled securely from Render environment variables)
+const BOT_USERNAME = 'chatdealer';
+const OAUTH_TOKEN = process.env.BOT_OAUTH_TOKEN;
+const CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 
 let botUserId = null;
 
